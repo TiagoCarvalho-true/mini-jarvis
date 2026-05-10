@@ -1,2 +1,6 @@
 .env
 venv
+*.onnx
+*.wav
+*.db
+jarvis_memory.db

@@ -121,18 +121,21 @@ class MicrophoneAdapter(AudioListenerPort):
         text = text.lower().strip()
         text = text.replace(".", "").replace(",", "").replace("!", "").replace("?", "")
         
-        # Variações comuns que o Whisper transcreve
-        wake_words = [
-            "jarvis", "javis", "javits", "jarves", "jarvs",
-            "jarvas", "jarvez", "jarvi", "javi", "jarves",
-            "travis", "chaves", "chavis", "davies", "davis",
-            "jarvís", "jarvês"
-        ]
+        # Se a wake word for Jarvis, usamos as variações
+        if self.wake_word == "jarvis":
+            wake_words = [
+                "jarvis", "javis", "javits", "jarves", "jarvs",
+                "jarvas", "jarvez", "jarvi", "javi", "jarves",
+                "travis", "chaves", "chavis", "davies", "davis",
+                "jarvís", "jarvês"
+            ]
+            for word in wake_words:
+                if word in text:
+                    return True
+            return False
         
-        for word in wake_words:
-            if word in text:
-                return True
-        return False
+        # Caso contrário (ex: "computador"), verificamos apenas a palavra exata configurada
+        return self.wake_word in text
 
     def listen_for_wake_word(self) -> bool:
         try:
