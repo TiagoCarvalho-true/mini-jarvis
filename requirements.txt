@@ -1,0 +1,11 @@
+openai
+faster-whisper
+piper-tts
+sounddevice
+soundfile
+numpy
+python-dotenv
+requests
+fastapi
+uvicorn
+sqlalchemy
