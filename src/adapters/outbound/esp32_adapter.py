@@ -56,7 +56,13 @@ class ESP32Adapter(IoTControllerPort):
         # Como o send_command da Port e sincrono mas aiohttp e async,
         # usamos um loop interno ou transformamos em async se necessario.
         # Para simplificar aqui, vamos rodar de forma sincrona:
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                raise RuntimeError()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
         return loop.run_until_complete(self._send_request(device.ip, path))
 
     def get_status(self, device_id: str) -> Dict:
@@ -64,7 +70,13 @@ class ESP32Adapter(IoTControllerPort):
             return {"status": "error", "message": "Dispositivo nao encontrado"}
         
         device = self.devices[device_id]
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                raise RuntimeError()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
         return loop.run_until_complete(self._send_request(device.ip, "/status", method="GET"))
 
     def list_devices(self) -> List[Dict]:

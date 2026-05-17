@@ -13,10 +13,10 @@ class IntentParser:
         
         # Palavras-chave para comandos IoT
         self.iot_keywords = {
+            "desligar": "off", "desligue": "off", "desativar": "off", "desative": "off",
+            "apagar": "off", "apague": "off", "fechar": "off", "feche": "off",
             "ligar": "on", "ligue": "on", "acender": "on", "acenda": "on",
-            "ativar": "on", "ative": "on", "abrir": "on", "abra": "on",
-            "desligar": "off", "desligue": "off", "apagar": "off", "apague": "off",
-            "desativar": "off", "desative": "off", "fechar": "off", "feche": "off"
+            "ativar": "on", "ative": "on", "abrir": "on", "abra": "on"
         }
         
         # Dispositivos conhecidos
