@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. | Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0e17;
+            --surface: #111827;
+            --border: #1e293b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59,130,246,0.3);
+            --success: #10b981;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --text: #e2e8f0;
+            --text-dim: #64748b;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 24px; margin-bottom: 24px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+        .logo { display: flex; align-items: center; gap: 16px; }
+        .arc-reactor {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: radial-gradient(circle, var(--accent), #1d4ed8);
+            box-shadow: 0 0 20px var(--accent-glow);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+            50% { box-shadow: 0 0 40px var(--accent-glow), 0 0 60px rgba(59,130,246,0.1); }
+        }
+        .logo h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; }
+        .logo h1 span { color: var(--accent); font-weight: 300; font-size: 0.9rem; }
+        .status-bar { display: flex; gap: 16px; }
+        .status-pill {
+            padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+            color: var(--success);
+        }
+        .status-pill.offline { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: var(--danger); }
+        .status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Grid Layout */
+        main { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+        /* Cards */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px;
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: var(--accent); }
+        .card h3 {
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px;
+            color: var(--text-dim); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* Chat */
+        .chat-history {
+            max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+        }
+        .chat-msg {
+            padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4;
+            max-width: 90%; animation: fadeIn 0.3s ease;
+        }
+        .chat-msg.user { background: rgba(59,130,246,0.15); align-self: flex-end; border: 1px solid rgba(59,130,246,0.2); }
+        .chat-msg.assistant { background: rgba(16,185,129,0.1); align-self: flex-start; border: 1px solid rgba(16,185,129,0.2); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Logs */
+        .log-console {
+            max-height: 400px; overflow-y: auto; font-family: 'Courier New', monospace;
+            font-size: 0.75rem; line-height: 1.6; color: var(--text-dim);
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+        }
+        .log-entry { padding: 4px 0; border-bottom: 1px solid rgba(30,41,59,0.5); }
+        .log-entry .time { color: var(--accent); }
+
+        /* IoT Grid */
+        .iot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .iot-device {
+            padding: 14px; border-radius: 12px; text-align: center;
+            background: rgba(30,41,59,0.5); border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .iot-device:hover { background: rgba(59,130,246,0.1); border-color: var(--accent); }
+        .iot-device .icon { font-size: 1.5rem; }
+        .iot-device .name { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+
+        /* Reconnecting banner */
+        .reconnecting {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: var(--warn); color: #000; text-align: center;
+            padding: 8px; font-size: 0.8rem; font-weight: 600;
+            display: none; z-index: 999;
+        }
+        .reconnecting.active { display: block; }
+
+        /* Text input */
+        .input-bar {
+            display: flex; gap: 10px; margin-top: 12px;
+        }
+        .input-bar input {
+            flex: 1; padding: 10px 16px; border-radius: 12px;
+            background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.85rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        .input-bar input:focus { border-color: var(--accent); }
+        .input-bar button {
+            padding: 10px 20px; border-radius: 12px; border: none;
+            background: var(--accent); color: white; font-weight: 600;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .input-bar button:hover { opacity: 0.85; }
+    </style>
+</head>
+<body>
+    <div class="reconnecting" id="reconnect-banner">🔄 Reconectando ao servidor...</div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="arc-reactor"></div>
+                <h1>J.A.R.V.I.S. <span>MINI</span></h1>
+            </div>
+            <div class="status-bar">
+                <div class="status-pill" id="ws-status">
+                    <span class="dot"></span> ONLINE
+                </div>
+                <div class="status-pill" id="uptime-pill">
+                    ⏱ <span id="uptime">00:00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section>
+                <div class="card">
+                    <h3>💬 DIALOGUE HISTORY</h3>
+                    <div id="chat-container" class="chat-history"></div>
+                    <div class="input-bar">
+                        <input type="text" id="chat-input" placeholder="Pergunte ao Jarvis..." 
+                               onkeypress="if(event.key==='Enter')sendChat()">
+                        <button onclick="sendChat()">ENVIAR</button>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="card">
+                    <h3>🦾 IOT NODES</h3>
+                    <div id="iot-container" class="iot-grid"></div>
+                </div>
+                <div class="card" style="margin-top:20px">
+                    <h3>👁️ VISION</h3>
+                    <div id="face-container"></div>
+                </div>
+            </section>
+
+            <section>
+                <div class="card">
+                    <h3>📟 SYSTEM LOGS</h3>
+                    <div id="log-container" class="log-console"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // ===== WebSocket com Exponential Backoff =====
+        let ws = null;
+        let reconnectDelay = 1000;
+        const MAX_DELAY = 30000;
+
+        function connectWS() {
+            const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${proto}//${location.host}/ws/events`);
+            
+            ws.onopen = () => {
+                reconnectDelay = 1000; // Reset backoff
+                document.getElementById('reconnect-banner').classList.remove('active');
+                document.getElementById('ws-status').classList.remove('offline');
+                document.getElementById('ws-status').innerHTML = '<span class="dot"></span> ONLINE';
+                addLog('WebSocket conectado.');
+            };
+            
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.type === 'chat') {
+                    addChat(data.role, data.content);
+                } else if (data.type === 'log') {
+                    addLog(data.message);
+                }
+            };
+            
+            ws.onclose = () => {
+                document.getElementById('reconnect-banner').classList.add('active');
+                document.getElementById('ws-status').classList.add('offline');
+                document.getElementById('ws-status').innerHTML = '<span class="dot"></span> OFFLINE';
+                // Exponential backoff: 1s -> 2s -> 4s -> 8s -> ... -> 30s max
+                setTimeout(() => {
+                    reconnectDelay = Math.min(reconnectDelay * 2, MAX_DELAY);
+                    connectWS();
+                }, reconnectDelay);
+            };
+            
+            ws.onerror = () => ws.close();
+        }
+        connectWS();
+
+        // ===== Chat =====
+        function addChat(role, content) {
+            const container = document.getElementById('chat-container');
+            const msg = document.createElement('div');
+            msg.className = `chat-msg ${role}`;
+            msg.textContent = content;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            addChat('user', text);
+            
+            try {
+                const res = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text})
+                });
+                const data = await res.json();
+                if (data.response) addChat('assistant', data.response);
+            } catch (e) {
+                addChat('assistant', 'Erro ao conectar com o servidor.');
+            }
+        }
+
+        // ===== Logs =====
+        function addLog(message) {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const time = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="time">[${time}]</span> ${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+            // Limita a 100 entradas
+            while (container.children.length > 100) container.removeChild(container.firstChild);
+        }
+
+        // ===== Status Polling =====
+        async function updateStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                if (data.uptime) document.getElementById('uptime').textContent = data.uptime;
+            } catch {}
+        }
+        setInterval(updateStatus, 5000);
+        updateStatus();
+
+        // ===== IoT Devices =====
+        async function loadDevices() {
+            try {
+                const res = await fetch('/api/devices');
+                const devices = await res.json();
+                const container = document.getElementById('iot-container');
+                container.innerHTML = '';
+                if (devices.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-dim);font-size:0.8rem">Nenhum dispositivo IoT configurado.</p>';
+                    return;
+                }
+                devices.forEach(d => {
+                    const div = document.createElement('div');
+                    div.className = 'iot-device';
+                    div.innerHTML = `<div class="icon">💡</div><div class="name">${d.id || d.name || d}</div>`;
+                    div.onclick = () => toggleDevice(d.id || d);
+                    container.appendChild(div);
+                });
+            } catch {}
+        }
+        loadDevices();
+
+        async function toggleDevice(id) {
+            try {
+                await fetch(`/api/devices/${id}/command?action=toggle`, {method: 'POST'});
+                addLog(`Comando enviado para ${id}`);
+            } catch {}
+        }
+
+        // ===== Faces =====
+        async function loadFaces() {
+            try {
+                const res = await fetch('/api/faces');
+                const faces = await res.json();
+                const container = document.getElementById('face-container');
+                container.innerHTML = faces.map(f => `<p style="color:var(--text-dim);font-size:0.85rem">👤 ${f}</p>`).join('');
+            } catch {}
+        }
+        loadFaces();
+    </script>
+</body>
+</html>

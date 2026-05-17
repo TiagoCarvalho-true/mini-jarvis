@@ -9,3 +9,9 @@ requests
 fastapi
 uvicorn
 sqlalchemy
+opencv-python
+face_recognition
+jinja2
+aiohttp
+websockets
+python-multipart

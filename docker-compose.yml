@@ -1,0 +1,19 @@
+version: '3.8'
+
+# docker-compose.yml — J.A.R.V.I.S. Mini
+# Nao usa Redis. Os processos se comunicam via SQLite (task_queue).
+# Use este arquivo apenas se quiser rodar o API Server em container.
+
+services:
+  api:
+    build: .
+    container_name: jarvis-api
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./jarvis_memory.db:/app/jarvis_memory.db
+      - ./known_faces:/app/known_faces
+    env_file:
+      - .env
+    command: ["python", "-m", "src.api_server"]

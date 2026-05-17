@@ -4,3 +4,10 @@ venv
 *.wav
 *.db
 jarvis_memory.db
+known_faces/*.jpg
+!known_faces/.gitkeep
+__pycache__/
+*.pyc
+*.db-shm
+*.db-wal
+*.stackdump

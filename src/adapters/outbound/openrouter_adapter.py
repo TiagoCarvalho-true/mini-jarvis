@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 from datetime import datetime
 from typing import List, Dict
 from src.ports.outbound.llm_port import LLMPort
@@ -73,23 +74,51 @@ Seu objetivo é agir como um verdadeiro assistente pessoal de alta tecnologia.
             "frequency_penalty": 0.2
         }
 
-        try:
-            response = requests.post(
-                self.url,
-                headers=self.headers,
-                json=payload,
-                timeout=60
-            )
+        # Retry com backoff para 429 (Too Many Requests)
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    self.url,
+                    headers=self.headers,
+                    json=payload,
+                    timeout=60
+                )
 
-            response.raise_for_status()
-            data = response.json()
-            answer = data["choices"][0]["message"]["content"]
-            return answer
+                # Se receber 429, espera e tenta novamente
+                if response.status_code == 429:
+                    wait_time = (attempt + 1) * 5  # 5s, 10s, 15s
+                    print(f"[LLM] Rate limit (429). Aguardando {wait_time}s... (tentativa {attempt+1}/{max_retries})")
+                    time.sleep(wait_time)
+                    continue
 
-        except requests.exceptions.Timeout:
-            return "Desculpe, senhor. A conexão com os servidores demorou mais do que o esperado."
-        except requests.exceptions.HTTPError as e:
-            return f"Senhor, detectei um erro HTTP: {str(e)}"
-        except Exception as e:
-            print(f"[OpenRouter Error] {e}")
-            return "Desculpe, senhor. Estou enfrentando uma instabilidade na rede principal."
+                response.raise_for_status()
+                data = response.json()
+                
+                # Verifica se a resposta tem o formato esperado
+                if "choices" not in data:
+                    print(f"[LLM] Resposta inesperada da API: {json.dumps(data, indent=2)[:500]}")
+                    if "error" in data:
+                        error_msg = data["error"].get("message", str(data["error"]))
+                        print(f"[LLM] Erro da API: {error_msg}")
+                        if "rate" in error_msg.lower() or "limit" in error_msg.lower():
+                            wait_time = (attempt + 1) * 5
+                            print(f"[LLM] Rate limit detectado. Aguardando {wait_time}s...")
+                            time.sleep(wait_time)
+                            continue
+                    return "Desculpe, senhor. Recebi uma resposta inesperada do servidor."
+                
+                answer = data["choices"][0]["message"]["content"]
+                return answer
+
+            except requests.exceptions.Timeout:
+                return "Desculpe, senhor. A conexão demorou mais do que o esperado."
+            except requests.exceptions.HTTPError as e:
+                if "429" not in str(e):
+                    return f"Senhor, detectei um erro HTTP: {str(e)}"
+            except Exception as e:
+                print(f"[LLM] Erro inesperado: {e}")
+                return "Desculpe, senhor. Estou enfrentando uma instabilidade na rede."
+        
+        # Se todas as tentativas falharam
+        return "Desculpe, senhor. Os servidores estão sobrecarregados. Tente novamente em alguns segundos."

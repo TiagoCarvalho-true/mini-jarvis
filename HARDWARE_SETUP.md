@@ -47,6 +47,39 @@ server.on("/relay/on", HTTP_POST, []() {
 
 ---
 
+---
+
+## 🛠️ Tutorial de Montagem e Integração
+
+### 1. Preparação do Raspberry Pi 3
+1. Instale o Raspberry Pi OS Lite (64-bit).
+2. Instale as dependências de sistema:
+   ```bash
+   sudo apt update
+   sudo apt install -y python3-pip portaudio19-dev libatlas-base-dev libopencv-dev
+   ```
+3. Clone o projeto e instale os requirements:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### 2. Conexão do ESP32 (Fisico)
+Para controlar uma lâmpada ou dispositivo AC:
+- **GPIO 12**: Conecte ao pino de sinal (IN) do Módulo Relé.
+- **GPIO 21 (SDA)**: Conecte ao pino SDA do Display OLED.
+- **GPIO 22 (SCL)**: Conecte ao pino SCL do Display OLED.
+- **VCC/GND**: Alimente os módulos com 5V (Relé) e 3.3V (OLED).
+- **Relé (Saída)**: Interrompa o fio da fase da lâmpada nos pinos COM e NO (Normalmente Aberto).
+
+### 3. Registro no J.A.R.V.I.S.
+No arquivo `.env` do servidor principal, adicione o nó:
+```env
+ESP32_NODES='[{"id": "quarto", "ip": "192.168.1.105", "name": "Luz do Quarto"}]'
+ESP32_MOCK=false
+```
+
+---
+
 ## 🏗️ Topologia Final
 
 ```text
@@ -55,6 +88,8 @@ server.on("/relay/on", HTTP_POST, []() {
       |-- (Voz) --> Microfone USB --> [ RASPBERRY PI 3 ]
       |                                      |
       |-- (Som) <-- Alto-falante  <-- [ SERVIDOR CORE  ]
+      |                                      |
+      |-- (Visao) <-- Webcam Notebook <------|
                                              |
                                           (Wi-Fi)
                                              |
@@ -69,3 +104,12 @@ server.on("/relay/on", HTTP_POST, []() {
                                             v
                                   [ DISPLAY OLED I2C ] (Exibindo animação)
 ```
+
+---
+
+## ❓ Solução de Problemas (Troubleshooting)
+
+1. **"Audio device not found"**: Verifique se o microfone está conectado e rode `python -c "import sounddevice; print(sounddevice.query_devices())"` para ver o ID.
+2. **Reconhecimento Facial Lento**: No Raspberry Pi, mude `VISION_MODE=on_demand` no `.env`. Isso fará ele processar a foto apenas quando você falar.
+3. **ESP32 Offline**: Certifique-se de que o ESP32 e o Jarvis estão na **mesma rede Wi-Fi**. Teste o IP do ESP32 no navegador primeiro.
+4. **Wake Word não detecta**: Ajuste o `silence_threshold` no `microphone_adapter.py` ou chegue mais perto do microfone.

@@ -1,0 +1,231 @@
+:root {
+    --primary: #00d4ff;
+    --secondary: #ff004c;
+    --bg: #050a10;
+    --glass: rgba(20, 30, 45, 0.7);
+    --border: rgba(0, 212, 255, 0.3);
+    --text: #e0f7ff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: var(--bg);
+    background-image: radial-gradient(circle at 50% 50%, #102035 0%, #050a10 100%);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.glass-container {
+    width: 95vw;
+    height: 90vh;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0, 212, 255, 0.1);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.arc-reactor {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, var(--primary) 60%);
+    box-shadow: 0 0 15px var(--primary);
+    animation: glow 2s infinite alternate;
+}
+
+h1 {
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+h1 span {
+    color: var(--primary);
+    font-weight: 300;
+}
+
+.status-panel {
+    display: flex;
+    gap: 30px;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.label {
+    font-size: 10px;
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+.value {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.pulse {
+    color: #00ff88;
+    animation: pulse 2s infinite;
+}
+
+main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.2fr 2fr 1fr;
+    gap: 20px;
+    min-height: 0;
+}
+
+.card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+h3 {
+    font-size: 12px;
+    margin-bottom: 15px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.chat-history, .log-console {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 85%;
+}
+
+.user-msg {
+    background: rgba(0, 212, 255, 0.1);
+    align-self: flex-end;
+    border-left: 3px solid var(--primary);
+}
+
+.jarvis-msg {
+    background: rgba(255, 0, 76, 0.05);
+    align-self: flex-start;
+    border-left: 3px solid var(--secondary);
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.node-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: all 0.3s;
+}
+
+.node-card:hover {
+    border-color: var(--primary);
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.node-card .btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    background: var(--primary);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.log-entry {
+    font-family: 'Courier New', Courier, monospace;
+    padding: 5px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.log-entry .time { color: var(--primary); }
+
+.upload-box {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+button {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 10px var(--primary); }
+    to { box-shadow: 0 0 25px var(--primary); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }

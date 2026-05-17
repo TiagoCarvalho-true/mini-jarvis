@@ -35,41 +35,70 @@ graph TD
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Core**: Python 3.12, FastAPI (Servidor Central), SQLAlchemy (SQLite)
+- **Core**: Python 3.12+, FastAPI (Servidor Central), SQLAlchemy (SQLite)
 - **STT (Ouvidos)**: `faster-whisper` (Offline, modelo `base` ou `tiny`)
 - **TTS (Voz)**: `piper-tts` (Offline, voz `pt_BR-faber-medium`)
 - **LLM (Cérebro)**: OpenRouter API (modelo LLaMA 3.3 70B gratuito)
-- **Hardware (Futuro)**: Raspberry Pi 3/4, ESP32, Módulo Relé, LEDs RGB, Display OLED
+- **Visão**: OpenCV (Haar Cascades para detecção de presença)
+- **Hardware**: Raspberry Pi 3/4, ESP32, Módulo Relé, LEDs RGB, Display OLED
 
 ## 🚀 Como Instalar e Rodar
 
-1. **Clone o repositório e instale as dependências:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 1. Instale as dependências
+```bash
+pip install -r requirements.txt
+```
 
-2. **Baixe o modelo de voz Piper (Faber):**
-   Faça o download dos arquivos `pt_BR-faber-medium.onnx` e `pt_BR-faber-medium.onnx.json` e coloque-os na **pasta raiz** do projeto.
+### 2. Baixe o modelo de voz Piper (Faber)
+Coloque os arquivos `pt_BR-faber-medium.onnx` e `pt_BR-faber-medium.onnx.json` na **pasta raiz**.
 
-3. **Configure as Variáveis de Ambiente:**
-   Copie o arquivo `.env.example` para `.env` e adicione sua chave de API do OpenRouter.
+### 3. Configure o ambiente
+Copie `.env.example` para `.env` e preencha sua chave do OpenRouter.
 
-4. **Inicie o Servidor Central:**
-   ```bash
-   python -m src.main
-   ```
-   O Jarvis falará *"Sistemas online"*. Basta dizer **"Jarvis"** (ou "Davies", "Javis") para ativar, e depois diga seu comando.
+### 4. Inicie os 2 Processos (em terminais separados)
+
+**Terminal 1 — API Server (Dashboard Web)**
+```bash
+python -m src.api_server
+```
+
+**Terminal 2 — Voice Worker (Mic + TTS + Visão + IoT)**
+```bash
+python -m src.voice_worker
+```
+
+> Os dois processos se comunicam via **SQLite** (tabela `task_queue`). Não precisa de Redis.
+
+### 5. Acesse o Dashboard
+Abra no navegador: **http://localhost:8000/dashboard**
 
 ---
 
-## 🗺️ Roadmap e Próximos Passos (Fase 2)
+## 📡 Firmware ESP32
 
-O J.A.R.V.I.S. está em constante evolução. Os próximos passos (já desenhados no `implementation_plan.md`) são:
+O código do ESP32 está em `esp32_firmware/`. Para instalar:
+1. Abra `main.ino` na Arduino IDE
+2. Configure Wi-Fi em `config.h`
+3. Instale as bibliotecas `Adafruit SSD1306` e `Adafruit GFX`
+4. Faça o Upload para o ESP32
 
-- [ ] **Módulo de Visão Computacional**: Integrar `OpenCV` e `face_recognition` em uma thread paralela. O Jarvis reconhecerá quem senta na frente do PC/Raspberry e fará saudações automáticas.
-- [ ] **Integração IoT (ESP32)**: Desenvolver o firmware em C++ para um ESP32 que atuará como "Corpo" do Jarvis. Ele terá um servidor HTTP para receber comandos do Python e acionar luzes e relés pela casa.
-- [ ] **Otimização Extrema**: Ajustar parâmetros para rodar com perfeição em ambientes de baixa RAM (como o Raspberry Pi 3 Model B - 1GB).
+Consulte `esp32_firmware/README.md` e `HARDWARE_SETUP.md` para detalhes.
 
 ---
-*Para instruções detalhadas de como montar o hardware físico (Raspberry + ESP32), consulte o arquivo `HARDWARE_SETUP.md`.*
-# mini-jarvis
+
+## ✅ Funcionalidades
+
+- [x] **STT Offline** — Faster Whisper (modelo base)
+- [x] **TTS Offline** — Piper (voz pt_BR-faber-medium)
+- [x] **LLM Inteligente** — OpenRouter com personalidade J.A.R.V.I.S.
+- [x] **Wake Word Híbrida** — Voz ("Jarvis") ou 2 palmas
+- [x] **Visão Computacional** — Detecção de presença via OpenCV
+- [x] **Dashboard Web Premium** — Interface HUD estilo Iron Man
+- [x] **Integração IoT (ESP32)** — Relés + Display OLED
+- [x] **Arquitetura Distribuída** — API Server + Voice Worker (sem Redis)
+- [x] **Memória Persistente** — SQLite com histórico de conversas
+- [x] **Intent Parser Local** — Classificação de comandos sem usar a API
+
+---
+
+*Para instruções de montagem do hardware (Raspberry Pi + ESP32), consulte `HARDWARE_SETUP.md`.*
